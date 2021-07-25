@@ -141,6 +141,7 @@ void scanHandler(const sensor_msgs::PointCloud2::ConstPtr& scanIn)
     terrainRecPitch = terrainPitchStack[odomRecIDPointer];
   }
 
+  // 使用了地形的RollPitch信息
   float sinTerrainRecRoll = sin(terrainRecRoll);
   float cosTerrainRecRoll = cos(terrainRecRoll);
   float sinTerrainRecPitch = sin(terrainRecPitch);
@@ -170,7 +171,7 @@ void scanHandler(const sensor_msgs::PointCloud2::ConstPtr& scanIn)
     scanData->points[i].z = pointZ3;
   }
 
-  // publish 5Hz registered scan messages
+  // publish registered scan messages
   sensor_msgs::PointCloud2 scanData2;
   pcl::toROSMsg(*scanData, scanData2);
   scanData2.header.stamp = ros::Time().fromSec(odomRecTime);
@@ -200,8 +201,9 @@ void terrainCloudHandler(const sensor_msgs::PointCloud2ConstPtr& terrainCloud2)
 
     float dis = sqrt((point.x - vehicleX) * (point.x - vehicleX) + (point.y - vehicleY) * (point.y - vehicleY));
 
-    if (dis < terrainRadiusZ)
+    if (dis < terrainRadiusZ)  // 1.0
     {
+      // 0~0.1(groundHeightThre)之间的点云认为是地面valid
       if (point.intensity < groundHeightThre)
       {
         elevMean += point.z;
@@ -292,6 +294,8 @@ void terrainCloudHandler(const sensor_msgs::PointCloud2ConstPtr& terrainCloud2)
     terrainPitch = (1.0 - smoothRateIncl) * terrainPitch + smoothRateIncl * matX.at<float>(0, 0);
     terrainRoll = (1.0 - smoothRateIncl) * terrainRoll + smoothRateIncl * matX.at<float>(1, 0);
   }
+  std::cout << "terrain PY: " << terrainPitch << ", " << terrainRoll << ", "
+            << "terrain Z: " << terrainZ << std::endl;
 }
 
 void speedHandler(const geometry_msgs::TwistStamped::ConstPtr& speedIn)
@@ -415,7 +419,7 @@ int main(int argc, char** argv)
     odomTrans.stamp_ = odomTime;
     odomTrans.setRotation(tf::Quaternion(geoQuat.x, geoQuat.y, geoQuat.z, geoQuat.w));
     odomTrans.setOrigin(tf::Vector3(vehicleX, vehicleY, vehicleZ));
-    tfBroadcaster.sendTransform(odomTrans);
+    tfBroadcaster.sendTransform(odomTrans);  // "map" to "sensor"
 
     // publish 200Hz Gazebo model state messages (this is for Gazebo simulation)
     cameraState.pose.orientation = geoQuat;
@@ -430,8 +434,8 @@ int main(int argc, char** argv)
     robotState.pose.position.z = vehicleZ;
     pubModelState.publish(robotState);
 
+    // Lidar始终保持与地形平行（无旋转）
     geoQuat = tf::createQuaternionMsgFromRollPitchYaw(terrainRoll, terrainPitch, 0);
-
     lidarState.pose.orientation = geoQuat;
     lidarState.pose.position.x = vehicleX;
     lidarState.pose.position.y = vehicleY;

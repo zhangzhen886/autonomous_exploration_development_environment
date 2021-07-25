@@ -49,6 +49,7 @@ void laserCloudAndOdometryHandler(const nav_msgs::Odometry::ConstPtr& odometry,
 
   odometryIn = *odometry;
 
+  // "map" to "sensor"
   transformToMap.setOrigin(
       tf::Vector3(odometryIn.pose.pose.position.x, odometryIn.pose.pose.position.y, odometryIn.pose.pose.position.z));
   transformToMap.setRotation(tf::Quaternion(odometryIn.pose.pose.orientation.x, odometryIn.pose.pose.orientation.y,
@@ -59,6 +60,7 @@ void laserCloudAndOdometryHandler(const nav_msgs::Odometry::ConstPtr& odometry,
   pcl::PointXYZ p1;
   tf::Vector3 vec;
 
+  // 点云转换到scan(sensor)坐标系
   for (int i = 0; i < laserCloudInNum; i++)
   {
     p1 = laserCloudIn->points[i];
@@ -75,6 +77,7 @@ void laserCloudAndOdometryHandler(const nav_msgs::Odometry::ConstPtr& odometry,
     laserCLoudInSensorFrame->points.push_back(p1);
   }
 
+  // odometry换用"/sensor_at_scan"frame后直接转发
   odometryIn.header.stamp = laserCloud2->header.stamp;
   odometryIn.header.frame_id = "/map";
   odometryIn.child_frame_id = "/sensor_at_scan";
