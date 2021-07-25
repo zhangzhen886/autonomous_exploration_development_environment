@@ -40,6 +40,7 @@
     <arg name="debug" value="$(arg debug)"/>
     <arg name="verbose" value="$(arg verbose)"/>
     <arg name="world_name" value="$(find vehicle_simulator)/world/$(arg world_name).world"/>
+    <!--<arg name="world_name" value="worlds/willowgarage.world"/>-->
   </include>
 
   <param name="camera_description" command="$(find xacro)/xacro --inorder '$(find vehicle_simulator)/urdf/camera.urdf.xacro'" />
@@ -51,7 +52,16 @@
   <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find vehicle_simulator)/urdf/robot.urdf.xacro'" />
   <node pkg="gazebo_ros" type="spawn_model" name="spawn_robot" args="-urdf -param /robot_description -model robot"/>
 
-  <node pkg="vehicle_simulator" type="vehicleSimulator" name="vehicleSimulator" output="screen" required="true">
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+    <param name="robot_description" value="robot_description"/>
+    <param name="use_tf_static" value="true"/>
+  </node>
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="sensorTransPublisher" args="0 0 $(arg cameraOffsetZ) -1.5707963 0 -1.5707963 /sensor /camera"/>
+  <node pkg="tf2_ros" type="static_transform_publisher" name="vehicleTransPublisher" args="-$(arg sensorOffsetX) -$(arg sensorOffsetY) -$(arg vehicleHeight) 0 0 0 /sensor /vehicle"/>
+  <node pkg="tf2_ros" type="static_transform_publisher" name="baseLinkTransPublisher" args="0 0 $(arg vehicleHeight) 0 0 0 /vehicle /base_origin"/>
+
+  <node pkg="vehicle_simulator" type="vehicleSimulator" name="vehicleSimulator" required="true">
     <param name="use_gazebo_time" type="bool" value="false" />
     <param name="sensorOffsetX" value="$(arg sensorOffsetX)" />
     <param name="sensorOffsetY" value="$(arg sensorOffsetY)" />

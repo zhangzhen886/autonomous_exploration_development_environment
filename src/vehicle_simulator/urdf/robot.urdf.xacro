@@ -7,9 +7,9 @@
   </xacro:macro>
 
   <link name="base_origin">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-    </visual>
+    <!--<visual>-->
+    <!--  <origin xyz="0 0 0" rpy="0 0 0"/>-->
+    <!--</visual>-->
   </link>
 
   <link name="base_link">
