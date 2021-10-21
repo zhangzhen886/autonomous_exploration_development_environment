@@ -1,0 +1,11 @@
+<launch>
+
+  <param name="use_sim_time" value="true"/>
+  <arg name="odom_topic" default="/odom"/>
+
+  <node pkg="sensor_scan_generation" type="registerScanGeneration" name="registerScanGeneration"
+        output="screen" required="true">
+    <remap from="/odom" to="$(arg odom_topic)"/>
+  </node>
+
+</launch>

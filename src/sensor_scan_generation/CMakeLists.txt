@@ -52,9 +52,11 @@ link_directories(
 
 ## Declare executables
 add_executable(sensorScanGeneration src/sensorScanGeneration.cpp)
+add_executable(registerScanGeneration src/registerScanGeneration.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(sensorScanGeneration ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(registerScanGeneration ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${PCL_LIBRARIES})
 
 install(TARGETS sensorScanGeneration
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

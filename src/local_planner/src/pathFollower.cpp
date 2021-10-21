@@ -336,6 +336,7 @@ int main(int argc, char** argv)
         else cmd_vel.twist.linear.x = vehicleSpeed;
         cmd_vel.twist.angular.z = vehicleYawRate;
         pubSpeed.publish(cmd_vel);
+        // pubSpeed.publish(cmd_vel.twist);
 
         pubSkipCount = pubSkipNum;
       }
