@@ -1,8 +1,10 @@
 <launch>
 
   <arg name="world_name" default="garage"/>
+  <arg name="odom_topic" default="/state_estimation"/>
 
   <node pkg="visualization_tools" type="visualizationTools" name="visualizationTools" output="screen">
+    <remap from="/state_estimation" to="$(arg odom_topic)"/>
     <param name="metricFile" type="string" value="$(find vehicle_simulator)/log/metrics" />
     <param name="trajFile" type="string" value="$(find vehicle_simulator)/log/trajectory" />
     <param name="mapFile" type="string" value="$(find vehicle_simulator)/mesh/$(arg world_name)/preview/pointcloud.ply" />

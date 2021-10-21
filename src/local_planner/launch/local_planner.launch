@@ -1,5 +1,7 @@
 <launch>
 
+  <arg name="odom_topic" default="/state_estimation"/>
+
   <arg name="sensorOffsetX" default="0"/>
   <arg name="sensorOffsetY" default="0"/>
   <arg name="cameraOffsetZ" default="0"/>
@@ -12,6 +14,7 @@
   <arg name="goalY" default="0"/>
 
   <node pkg="local_planner" type="localPlanner" name="localPlanner" output="screen" required="true">
+    <remap from="/state_estimation" to="$(arg odom_topic)"/>
     <param name="pathFolder" type="string" value="$(find local_planner)/paths" />
     <param name="vehicleLength" type="double" value="0.6" />
     <param name="vehicleWidth" type="double" value="0.6" />
@@ -54,6 +57,7 @@
   </node>
 
   <node pkg="local_planner" type="pathFollower" name="pathFollower" output="screen" required="true">
+    <remap from="/state_estimation" to="$(arg odom_topic)"/>
     <param name="sensorOffsetX" value="$(arg sensorOffsetX)" />
     <param name="sensorOffsetY" value="$(arg sensorOffsetY)" />
     <param name="pubSkipNum" type="int" value="1" />

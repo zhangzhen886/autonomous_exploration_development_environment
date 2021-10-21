@@ -1,0 +1,44 @@
+<launch>
+
+  <arg name="world_name" default="garage"/>
+  <arg name="vehicleHeight" default="0.35"/>
+  <arg name="cameraOffsetZ" default="0"/>
+  <arg name="gazebo_gui" default="true"/>
+  <arg name="checkTerrainConn" default="false"/>
+
+  <!--<include file="$(find ps3joy)/launch/ps3.launch" />-->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="baseLinkTransPublisher"
+        args="0 0 -$(arg vehicleHeight) 0 0 0 /base_link /vehicle"/>
+
+  <include file="$(find sensor_scan_generation)/launch/register_scan_generation.launch" />
+
+  <include file="$(find terrain_analysis)/launch/terrain_analysis.launch" >
+    <arg name="laser_topic" value="/registered_scan"/>
+    <arg name="odom_topic" value="/state_estimation_at_scan"/>
+    <arg name="pub_terrain_topic" value="/terrain_map"/>
+  </include>
+
+  <include file="$(find terrain_analysis_ext)/launch/terrain_analysis_ext.launch" >
+    <arg name="laser_topic" value="/registered_scan"/>
+    <arg name="odom_topic" value="/state_estimation_at_scan"/>
+    <arg name="pub_terrain_topic" value="/terrain_map_ext"/>
+    <arg name="checkTerrainConn" value="$(arg checkTerrainConn)"/>
+  </include>
+
+  <include file="$(find local_planner)/launch/local_planner.launch" >
+    <arg name="cameraOffsetZ" value="$(arg cameraOffsetZ)"/>
+    <arg name="odom_topic" value="/odom/ground_truth"/>
+    <arg name="maxSpeed" value="1.0"/>
+    <arg name="twoWayDrive" value="false"/>
+    <arg name="autonomyMode" value="true"/>
+  </include>
+
+  <include file="$(find visualization_tools)/launch/visualization_tools.launch" >
+    <arg name="world_name" value="$(arg world_name)"/>
+    <arg name="odom_topic" value="/odom/ground_truth"/>
+  </include>
+
+  <node launch-prefix="nice" pkg="rviz" type="rviz" name="rvizGA"
+        args="-d $(find vehicle_simulator)/rviz/champ_simulator.rviz" respawn="true"/>
+
+</launch>

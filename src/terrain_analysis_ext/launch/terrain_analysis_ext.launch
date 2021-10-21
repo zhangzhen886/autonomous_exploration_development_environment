@@ -1,8 +1,15 @@
 <launch>
 
+  <arg name="laser_topic" default="/registered_scan"/>
+  <arg name="odom_topic" default="/state_estimation"/>
+  <arg name="pub_terrain_topic" default="/terrain_map_ext"/>
+
   <arg name="checkTerrainConn" default="false"/>
 
   <node pkg="terrain_analysis_ext" type="terrainAnalysisExt" name="terrainAnalysisExt" output="screen" required="true">
+    <remap from="/registered_scan" to="$(arg laser_topic)"/>
+    <remap from="/state_estimation" to="$(arg odom_topic)"/>
+    <remap from="/terrain_map_ext" to="$(arg pub_terrain_topic)"/>
     <param name="scanVoxelSize" type="double" value="0.1" />
     <param name="decayTime" type="double" value="10.0" />
     <param name="noDecayDis" type="double" value="0" />
