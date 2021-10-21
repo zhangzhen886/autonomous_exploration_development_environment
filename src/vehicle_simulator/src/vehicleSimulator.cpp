@@ -302,6 +302,8 @@ void speedHandler(const geometry_msgs::TwistStamped::ConstPtr& speedIn)
 {
   vehicleSpeed = speedIn->twist.linear.x;
   vehicleYawRate = speedIn->twist.angular.z;
+  // vehicleSpeed = speedIn->twist.linear.x;
+  // vehicleYawRate = speedIn->twist.angular.z;
 }
 
 int main(int argc, char** argv)
@@ -417,6 +419,8 @@ int main(int argc, char** argv)
 
     // publish 200Hz tf messages
     odomTrans.stamp_ = odomTime;
+    odomTrans.frame_id_ = "/map";
+    odomTrans.child_frame_id_ = "/sensor";
     odomTrans.setRotation(tf::Quaternion(geoQuat.x, geoQuat.y, geoQuat.z, geoQuat.w));
     odomTrans.setOrigin(tf::Vector3(vehicleX, vehicleY, vehicleZ));
     tfBroadcaster.sendTransform(odomTrans);  // "map" to "sensor"
@@ -441,6 +445,12 @@ int main(int argc, char** argv)
     lidarState.pose.position.y = vehicleY;
     lidarState.pose.position.z = vehicleZ;
     pubModelState.publish(lidarState);
+
+    odomTrans.frame_id_ = "/map";
+    odomTrans.child_frame_id_ = "/velodyne";
+    odomTrans.setRotation(tf::Quaternion(geoQuat.x, geoQuat.y, geoQuat.z, geoQuat.w));
+    odomTrans.setOrigin(tf::Vector3(vehicleX, vehicleY, vehicleZ));
+    tfBroadcaster.sendTransform(odomTrans);  // "map" to "sensor"
 
     status = ros::ok();
     rate.sleep();
